@@ -1,5 +1,6 @@
 public class Main {
     public static void main(String[] args) {
+
         Grid cityGrid = new Grid(10, 10);
         Truck truck = new Truck(0, 0);
         cityGrid.addStore(new Store(5, 7));
