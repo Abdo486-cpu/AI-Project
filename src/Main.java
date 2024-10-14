@@ -2,7 +2,7 @@ public class Main {
     public static void main(String[] args) {
 
         Grid cityGrid = new Grid(10, 10);
-        Truck truck = new Truck(0, 0);
+        Truck truck = new Truck(1, 1);
         cityGrid.addStore(new Store(5, 7));
         cityGrid.addDestination(new Destination(9, 5));
         cityGrid.addObstacle(new Obstacle(5, 5));
@@ -11,8 +11,10 @@ public class Main {
 
         cityGrid.printGrid();
 
-        cityGrid.MoveTruck(truck,Movement.RIGHT);
+        System.out.println(truck);
 
+        cityGrid.MoveTruck(truck,Movement.LEFT);
+        System.out.println(truck);
         cityGrid.printGrid();
     }
 }

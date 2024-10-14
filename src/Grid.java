@@ -56,10 +56,10 @@ public class Grid {
     public void MoveTruck(Truck truck , Movement movement) {
         grid[truck.getX()][truck.getY()].setType(CellType.EMPTY);
         switch (movement){
-            case UP: truck.setY(truck.getY()+1);
-            case DOWN: truck.setY(truck.getY()-1);
-            case LEFT: truck.setX(truck.getX()-1);
-            case RIGHT: truck.setX(truck.getX()+1);
+            case UP: truck.setY(truck.getY()+1); break;
+            case DOWN: truck.setY(truck.getY()-1); break;
+            case LEFT: truck.setX(truck.getX()-1); break;
+            case RIGHT: truck.setX(truck.getX()+1); break;
         }
         grid[truck.getX()][truck.getY()].setType(CellType.TRUCK);
     }
