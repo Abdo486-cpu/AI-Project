@@ -7,7 +7,6 @@ public class Grid {
     private final List<Destination> destinations;
     private final List<Obstacle> obstacles;
     private final List<Tunnel> tunnels;
-    private Truck truck;
 
     public Grid(int width, int height) {
         this.width = width;

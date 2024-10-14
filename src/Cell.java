@@ -1,10 +1,7 @@
 public class Cell {
-    private final int x, y;
     private CellType type;
 
     public Cell(int x, int y) {
-        this.x = x;
-        this.y = y;
         this.type = CellType.EMPTY;
     }
 
