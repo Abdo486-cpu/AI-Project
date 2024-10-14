@@ -2,7 +2,6 @@ public class Truck {
     private int x;
     private int y;
 
-    // Constructor
     public Truck(int x, int y) {
         this.x = x;
         this.y = y;
