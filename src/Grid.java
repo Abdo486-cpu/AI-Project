@@ -48,19 +48,22 @@ public class Grid {
         grid[tunnel.x2()][tunnel.y2()].setType(CellType.TUNNEL_EXIT);
     }
 
-    public void addTruck(Truck truck){
-        grid[truck.getX()][truck.getY()].setType(CellType.TRUCK);
+    public void addTruck(Truck truck) {
+        grid[truck.getX()][truck.getY()].setTruck();
     }
 
-    public void MoveTruck(Truck truck , Movement movement) {
-        grid[truck.getX()][truck.getY()].setType(CellType.EMPTY);
-        switch (movement){
-            case UP: truck.setY(truck.getY()+1); break;
-            case DOWN: truck.setY(truck.getY()-1); break;
-            case LEFT: truck.setX(truck.getX()-1); break;
-            case RIGHT: truck.setX(truck.getX()+1); break;
+    public void MoveTruck(Truck truck, Movement movement) {
+        Cell currentCell = grid[truck.getX()][truck.getY()];
+        currentCell.removeTruck();
+
+        switch (movement) {
+            case UP -> truck.setY(truck.getY() + 1);
+            case DOWN -> truck.setY(truck.getY() - 1);
+            case LEFT -> truck.setX(truck.getX() - 1);
+            case RIGHT -> truck.setX(truck.getX() + 1);
         }
-        grid[truck.getX()][truck.getY()].setType(CellType.TRUCK);
+        Cell newCell = grid[truck.getX()][truck.getY()];
+        newCell.setTruck();
     }
 
     public void printGrid() {
@@ -78,4 +81,31 @@ public class Grid {
         }
         System.out.println();
     }
+
+    public Cell getCell(int x, int y) {
+        return grid[x][y];
+    }
+
+    public Cell getNeighbor(Cell cell, Movement movement) {
+        int x = cell.getX();
+        int y = cell.getY();
+
+        switch (movement) {
+            case UP:
+                if (y + 1 < height) return grid[x][y + 1];
+                break;
+            case DOWN:
+                if (y - 1 >= 0) return grid[x][y - 1];
+                break;
+            case LEFT:
+                if (x - 1 >= 0) return grid[x - 1][y];
+                break;
+            case RIGHT:
+                if (x + 1 < width) return grid[x + 1][y];
+                break;
+        }
+
+        return null;
+    }
+
 }
