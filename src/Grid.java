@@ -62,7 +62,22 @@ public class Grid {
             case LEFT -> truck.setX(truck.getX() - 1);
             case RIGHT -> truck.setX(truck.getX() + 1);
         }
+
         Cell newCell = grid[truck.getX()][truck.getY()];
+
+        for (Tunnel tunnel : tunnels) {
+            if (newCell.getX() == tunnel.x1() && newCell.getY() == tunnel.y1()) {
+                truck.setX(tunnel.x2());
+                truck.setY(tunnel.y2());
+                newCell = grid[truck.getX()][truck.getY()];
+                break;
+            } else if (newCell.getX() == tunnel.x2() && newCell.getY() == tunnel.y2()) {
+                truck.setX(tunnel.x1());
+                truck.setY(tunnel.y1());
+                newCell = grid[truck.getX()][truck.getY()];
+                break;
+            }
+        }
         newCell.setTruck();
     }
 
@@ -89,23 +104,37 @@ public class Grid {
     public Cell getNeighbor(Cell cell, Movement movement) {
         int x = cell.getX();
         int y = cell.getY();
+        Cell neighbor = null;
 
         switch (movement) {
             case UP:
-                if (y + 1 < height) return grid[x][y + 1];
+                if (y + 1 < height) neighbor = grid[x][y + 1];
                 break;
             case DOWN:
-                if (y - 1 >= 0) return grid[x][y - 1];
+                if (y - 1 >= 0) neighbor = grid[x][y - 1];
                 break;
             case LEFT:
-                if (x - 1 >= 0) return grid[x - 1][y];
+                if (x - 1 >= 0) neighbor = grid[x - 1][y];
                 break;
             case RIGHT:
-                if (x + 1 < width) return grid[x + 1][y];
+                if (x + 1 < width) neighbor = grid[x + 1][y];
                 break;
         }
 
-        return null;
+        if (neighbor != null) {
+            for (Tunnel tunnel : tunnels) {
+                if (neighbor.getX() == tunnel.x1() && neighbor.getY() == tunnel.y1()) {
+                    neighbor = grid[tunnel.x2()][tunnel.y2()];
+                    break;
+                } else if (neighbor.getX() == tunnel.x2() && neighbor.getY() == tunnel.y2()) {
+                    neighbor = grid[tunnel.x1()][tunnel.y1()];
+                    break;
+                }
+            }
+        }
+
+        return neighbor;
     }
+
 
 }

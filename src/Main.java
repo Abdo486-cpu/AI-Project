@@ -5,15 +5,15 @@ public class Main {
     public static void main(String[] args) {
         Grid cityGrid = new Grid(10, 10);
 
-        Store store = new Store(5, 7);
+        Store store = new Store(0, 0);
         Destination destination = new Destination(9, 5);
         cityGrid.addStore(store);
         cityGrid.addDestination(destination);
         cityGrid.addObstacle(new Obstacle(5, 6));
         cityGrid.addObstacle(new Obstacle(7, 7));
-        cityGrid.addTunnel(new Tunnel(2, 2, 8, 8));
+        cityGrid.addTunnel(new Tunnel(1, 2, 8, 8));
 
-        Truck truck = new Truck(5, 7);
+        Truck truck = new Truck(0, 0);
         cityGrid.addTruck(truck);
 
         testPathFinder(cityGrid, store, destination, truck);
