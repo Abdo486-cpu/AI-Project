@@ -10,6 +10,7 @@ public class PathFinder {
     public List<Movement> findPathDFS(Store store, Destination destination){
         Stack<Node> stack = new Stack<>();
         Set<Cell> visited = new HashSet<>();
+        int nodesExpanded = 1;
         Cell startCell = grid.getCell(store.x(), store.y());
         Node startNode = new Node(startCell, null, null);
         stack.add(startNode);
@@ -17,9 +18,11 @@ public class PathFinder {
 
         while (!stack.isEmpty()){
             Node currentNode = stack.pop();
+            nodesExpanded++;
             Cell currentCell = currentNode.cell();
 
             if (currentCell.getX() == destination.x() && currentCell.getY() == destination.y()) {
+                System.out.println("Nodes Expanded: "+nodesExpanded);
                 return reconstructPath(currentNode);
             }
 
@@ -33,13 +36,14 @@ public class PathFinder {
                 }
             }
         }
+        System.out.println("Nodes Expanded: "+nodesExpanded);
         return Collections.emptyList();
     }
 
     public List<Movement> findPathBFS(Store store, Destination destination) {
         Queue<Node> queue = new LinkedList<>();
         Set<Cell> visited = new HashSet<>();
-
+        int nodesExpanded = 1;
         Cell startCell = grid.getCell(store.x(), store.y());
         Node startNode = new Node(startCell, null, null);
         queue.add(startNode);
@@ -47,9 +51,11 @@ public class PathFinder {
 
         while (!queue.isEmpty()) {
             Node currentNode = queue.poll();
+            nodesExpanded++;
             Cell currentCell = currentNode.cell();
 
             if (currentCell.getX() == destination.x() && currentCell.getY() == destination.y()) {
+                System.out.println("Nodes Expanded: "+nodesExpanded);
                 return reconstructPath(currentNode);
             }
 
@@ -63,7 +69,7 @@ public class PathFinder {
                 }
             }
         }
-
+        System.out.println("Nodes Expanded: "+nodesExpanded);
         return Collections.emptyList();
     }
 

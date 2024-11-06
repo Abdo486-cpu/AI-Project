@@ -9,8 +9,8 @@ public class Main {
         Destination destination = new Destination(9, 5);
         cityGrid.addStore(store);
         cityGrid.addDestination(destination);
-        cityGrid.addObstacle(new Obstacle(5, 6));
-        cityGrid.addObstacle(new Obstacle(7, 7));
+        cityGrid.addObstacle(new Obstacle(1, 0,1,1));
+        cityGrid.addObstacle(new Obstacle(9, 5,9,6));
         cityGrid.addTunnel(new Tunnel(1, 2, 8, 8));
 
         Truck truck = new Truck(0, 0);
@@ -25,6 +25,7 @@ public class Main {
         PathFinder pathFinder = new PathFinder(cityGrid);
 
         List<Movement> path = pathFinder.findPathBFS(store, destination);
+//        List<Movement> path = pathFinder.findPathDFS(store, destination);
 
         if (path.isEmpty()) {
             System.out.println("No path found from store to destination.");
