@@ -39,7 +39,6 @@ public class Grid {
 
     public void addObstacle(Obstacle obstacle) {
         obstacles.add(obstacle);
-        grid[obstacle.x()][obstacle.y()].setType(CellType.OBSTACLE);
     }
 
     public void addTunnel(Tunnel tunnel) {
@@ -86,13 +85,35 @@ public class Grid {
             for (int i = 0; i < width; i++) {
                 System.out.print(grid[i][j]);
                 if (i < width - 1) {
-                    System.out.print(" ");
+                    boolean hasObstacleHorizontal = false;
+                    for (Obstacle obs : obstacles) {
+                        if ((i == obs.x1() && i + 1 == obs.x2() && j == obs.y1() && j == obs.y2()) ||
+                                (i == obs.x2() && i + 1 == obs.x1() && j == obs.y2() && j == obs.y1())) {
+                            hasObstacleHorizontal = true;
+                            break;
+                        }
+                    }
+                    System.out.print(hasObstacleHorizontal ? "-O-" : "---");
                 }
             }
             System.out.println();
+            if (j > 0) {
+                for (int i = 0; i < width; i++) {
+                    boolean hasObstacleVerticle = false;
+                    for (Obstacle obs : obstacles) {
+                        if ((i == obs.x1() && i == obs.x2() && j == obs.y1() && j - 1 == obs.y2()) ||
+                                (i == obs.x2() && i == obs.x1() && j == obs.y2() && j - 1 == obs.y1())) {
+                            hasObstacleVerticle = true;
+                            break;
+                        }
+                    }
+                    System.out.print(hasObstacleVerticle ? "O   " : "|   ");
+                }
+                System.out.println();
+            }
         }
         for (int i = 0; i < width; i++) {
-            System.out.print("--");
+            System.out.print("----");
         }
         System.out.println();
     }
@@ -108,15 +129,39 @@ public class Grid {
 
         switch (movement) {
             case UP:
+                for (Obstacle obs : obstacles) {
+                    if ((x == obs.x1() && x == obs.x2() && y == obs.y1() && y + 1 == obs.y2()) ||
+                            (x == obs.x2() && x == obs.x1() && y == obs.y2() && y + 1 == obs.y1())) {
+                        return null;
+                    }
+                }
                 if (y + 1 < height) neighbor = grid[x][y + 1];
                 break;
             case DOWN:
+                for (Obstacle obs : obstacles) {
+                    if ((x == obs.x1() && x == obs.x2() && y == obs.y1() && y - 1 == obs.y2()) ||
+                            (x == obs.x2() && x == obs.x1() && y == obs.y2() && y - 1 == obs.y1())) {
+                        return null;
+                    }
+                }
                 if (y - 1 >= 0) neighbor = grid[x][y - 1];
                 break;
             case LEFT:
+                for (Obstacle obs : obstacles) {
+                    if ((x == obs.x1() && x - 1 == obs.x2() && y == obs.y1() && y == obs.y2()) ||
+                            (x == obs.x2() && x - 1 == obs.x1() && y == obs.y2() && y == obs.y1())) {
+                        return null;
+                    }
+                }
                 if (x - 1 >= 0) neighbor = grid[x - 1][y];
                 break;
             case RIGHT:
+                for (Obstacle obs : obstacles) {
+                    if ((x == obs.x1() && x + 1 == obs.x2() && y == obs.y1() && y == obs.y2()) ||
+                            (x == obs.x2() && x + 1 == obs.x1() && y == obs.y2() && y == obs.y1())) {
+                        return null;
+                    }
+                }
                 if (x + 1 < width) neighbor = grid[x + 1][y];
                 break;
         }
