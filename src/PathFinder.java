@@ -7,10 +7,10 @@ public class PathFinder {
         this.grid = grid;
     }
 
-    public List<Movement> findPathDFS(Store store, Destination destination){
+    public Result findPathDFS(Store store, Destination destination){
         Stack<Node> stack = new Stack<>();
         Set<Cell> visited = new HashSet<>();
-        int nodesExpanded = 1;
+        int nodesExpanded = 0;
         Cell startCell = grid.getCell(store.x(), store.y());
         Node startNode = new Node(startCell, null, null);
         stack.add(startNode);
@@ -22,8 +22,7 @@ public class PathFinder {
             Cell currentCell = currentNode.cell();
 
             if (currentCell.getX() == destination.x() && currentCell.getY() == destination.y()) {
-                System.out.println("Nodes Expanded: "+nodesExpanded);
-                return reconstructPath(currentNode);
+                return reconstructPath(currentNode,nodesExpanded);
             }
 
             for (Movement movement : Movement.values()) {
@@ -36,14 +35,13 @@ public class PathFinder {
                 }
             }
         }
-        System.out.println("Nodes Expanded: "+nodesExpanded);
-        return Collections.emptyList();
+        return new Result(nodesExpanded,null);
     }
 
-    public List<Movement> findPathBFS(Store store, Destination destination) {
+    public Result findPathBFS(Store store, Destination destination) {
         Queue<Node> queue = new LinkedList<>();
         Set<Cell> visited = new HashSet<>();
-        int nodesExpanded = 1;
+        int nodesExpanded = 0;
         Cell startCell = grid.getCell(store.x(), store.y());
         Node startNode = new Node(startCell, null, null);
         queue.add(startNode);
@@ -55,8 +53,7 @@ public class PathFinder {
             Cell currentCell = currentNode.cell();
 
             if (currentCell.getX() == destination.x() && currentCell.getY() == destination.y()) {
-                System.out.println("Nodes Expanded: "+nodesExpanded);
-                return reconstructPath(currentNode);
+                return reconstructPath(currentNode,nodesExpanded);
             }
 
             for (Movement movement : Movement.values()) {
@@ -69,20 +66,66 @@ public class PathFinder {
                 }
             }
         }
-        System.out.println("Nodes Expanded: "+nodesExpanded);
-        return Collections.emptyList();
+        return new Result(nodesExpanded,null);
     }
 
-    private List<Movement> reconstructPath(Node node) {
+    public Result findPathIDDFS(Store store, Destination destination) {
+        int depth = 0;
+        int nodesExpanded = 0;
+        while (true) {
+            Set<Cell> visited = new HashSet<>();
+            Result result = depthLimitedSearch(store, destination, depth, visited, nodesExpanded);
+            nodesExpanded = result.nodesExpanded();
+            if (result.path() != null) {
+                return result;
+            }
+            depth++;
+        }
+    }
+
+    private Result depthLimitedSearch(Store store, Destination destination, int depthLimit, Set<Cell> visited, int nodesExpanded) {
+        Stack<Node> stack = new Stack<>();
+        Cell startCell = grid.getCell(store.x(), store.y());
+        Node startNode = new Node(startCell, null, null);
+        stack.add(startNode);
+
+        while (!stack.isEmpty()) {
+            Node currentNode = stack.pop();
+            nodesExpanded++;
+            Cell currentCell = currentNode.cell();
+
+            if (currentCell.getX() == destination.x() && currentCell.getY() == destination.y()) {
+                return reconstructPath(currentNode, nodesExpanded);
+            }
+
+            if (depthLimit > 0) {
+                visited.add(currentCell);
+
+                for (Movement movement : Movement.values()) {
+                    Cell neighbor = grid.getNeighbor(currentCell, movement);
+
+                    if (neighbor != null && !visited.contains(neighbor) && !neighbor.isObstacle()) {
+                        Node neighborNode = new Node(neighbor, currentNode, movement);
+                        stack.add(neighborNode);
+                    }
+                }
+            }
+        }
+        return new Result(nodesExpanded,null);
+    }
+
+
+    private Result reconstructPath(Node node, Integer nodesExpanded) {
         List<Movement> path = new ArrayList<>();
         while (node != null && node.movement() != null) {
             path.add(node.movement());
             node = node.parent();
         }
         Collections.reverse(path);
-        return path;
+        return new Result(nodesExpanded,path);
     }
 }
 
-record Node(Cell cell, Node parent, Movement movement) {
-}
+record Node(Cell cell, Node parent, Movement movement) { }
+
+record Result(int nodesExpanded, List<Movement> path) {}
