@@ -7,11 +7,15 @@ public class Grid {
     private final List<Destination> destinations;
     private final List<Obstacle> obstacles;
     private final List<Tunnel> tunnels;
+    private final int[][] costHorizontal;
+    private final int[][] costVertical;
 
     public Grid(int width, int height) {
         this.width = width;
         this.height = height;
         this.grid = new Cell[width][height];
+        this.costHorizontal = new int[width - 1][height];
+        this.costVertical = new int[width][height - 1];
         this.stores = new ArrayList<>();
         this.destinations = new ArrayList<>();
         this.obstacles = new ArrayList<>();
@@ -23,6 +27,16 @@ public class Grid {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 grid[i][j] = new Cell(i, j);
+            }
+        }
+        for (int i = 0; i < width - 1; i++) {
+            for (int j = 0; j < height; j++) {
+                costHorizontal[i][j] = (int) (Math.random() * 4) + 1;
+            }
+        }
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height - 1; j++) {
+                costVertical[i][j] = (int) (Math.random() * 4) + 1;
             }
         }
     }
@@ -93,11 +107,12 @@ public class Grid {
                             break;
                         }
                     }
-                    System.out.print(hasObstacleHorizontal ? "-O-" : "---");
+                    System.out.print(hasObstacleHorizontal ? "--O--" : "--" + costHorizontal[i][j] + "--");
                 }
             }
             System.out.println();
             if (j > 0) {
+//                System.out.println("|     ".repeat(width));
                 for (int i = 0; i < width; i++) {
                     boolean hasObstacleVerticle = false;
                     for (Obstacle obs : obstacles) {
@@ -107,13 +122,14 @@ public class Grid {
                             break;
                         }
                     }
-                    System.out.print(hasObstacleVerticle ? "O   " : "|   ");
+                    System.out.print(hasObstacleVerticle ? "O     " : costVertical[i][j-1] + "     ");
                 }
                 System.out.println();
+//                System.out.println("|     ".repeat(width));
             }
         }
         for (int i = 0; i < width; i++) {
-            System.out.print("----");
+            System.out.print("------");
         }
         System.out.println();
     }
