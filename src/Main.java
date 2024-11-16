@@ -6,7 +6,7 @@ public class Main {
         Grid cityGrid = new Grid(10, 10);
 
         Store store = new Store(0, 0);
-        Destination destination = new Destination(9, 9);
+        Destination destination = new Destination(1, 0);
         cityGrid.addStore(store);
         cityGrid.addDestination(destination);
         cityGrid.addObstacle(new Obstacle(1, 0,1,1));
@@ -29,6 +29,7 @@ public class Main {
         List<Movement> path = res.path();
         int nodesExpanded = res.nodesExpanded();
         System.out.println("Nodes expanded: " + nodesExpanded);
+        System.out.println("Cost: " + res.cost()) ;
         if (path == null) {
             System.out.println("No path found from store to destination.");
         } else {
