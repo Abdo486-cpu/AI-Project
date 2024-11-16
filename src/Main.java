@@ -19,7 +19,6 @@ public class Main {
         cityGrid.addTruck(truck);
 
         testPathFinder(cityGrid, store, destination, truck);
-
         cityGrid.printGrid();
     }
 
