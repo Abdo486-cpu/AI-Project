@@ -6,14 +6,14 @@ public class Main {
         Grid cityGrid = new Grid(10, 10);
 
         Store store = new Store(0, 0);
-        Destination destination = new Destination(1, 0);
+        Destination destination = new Destination(8, 4);
         cityGrid.addStore(store);
         cityGrid.addDestination(destination);
         cityGrid.addObstacle(new Obstacle(1, 0,1,1));
 //        cityGrid.addObstacle(new Obstacle(8, 9,9,9));
 //        cityGrid.addObstacle(new Obstacle(9, 8,9,9));
         cityGrid.addObstacle(new Obstacle(9, 5,9,6));
-        cityGrid.addTunnel(new Tunnel(1, 2, 8, 8));
+//        cityGrid.addTunnel(new Tunnel(1, 2, 8, 8));
 
         Truck truck = new Truck(0, 0);
         cityGrid.addTruck(truck);
@@ -25,7 +25,7 @@ public class Main {
     public static void testPathFinder(Grid cityGrid, Store store, Destination destination, Truck truck) {
         PathFinder pathFinder = new PathFinder(cityGrid);
 
-        Result res = pathFinder.findPathIDDFS(store, destination);
+        Result res = pathFinder.findPathGreedy(store, destination, Heuristic.euclideanDistance());
         List<Movement> path = res.path();
         int nodesExpanded = res.nodesExpanded();
         System.out.println("Nodes expanded: " + nodesExpanded);
