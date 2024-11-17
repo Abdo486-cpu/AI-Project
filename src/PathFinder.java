@@ -29,7 +29,7 @@ public class PathFinder {
                 Cell neighbor = grid.getNeighbor(currentCell, movement);
 
                 if (neighbor != null && !visited.contains(neighbor) && !neighbor.isObstacle()) {
-                    int cost = currentNode.cost() + getMovementCostUCS(currentCell, neighbor, movement);
+                    int cost = currentNode.cost() + getMovementCost(currentCell, neighbor, movement);
                     Node neighborNode = new Node(neighbor, currentNode, movement,cost);
                     stack.add(neighborNode);
                     visited.add(neighbor);
@@ -61,7 +61,7 @@ public class PathFinder {
                 Cell neighbor = grid.getNeighbor(currentCell, movement);
 
                 if (neighbor != null && !visited.contains(neighbor) && !neighbor.isObstacle()) {
-                    int cost = currentNode.cost() + getMovementCostUCS(currentCell, neighbor, movement);
+                    int cost = currentNode.cost() + getMovementCost(currentCell, neighbor, movement);
                     Node neighborNode = new Node(neighbor, currentNode, movement,cost);
                     queue.add(neighborNode);
                     visited.add(neighbor);
@@ -108,7 +108,7 @@ public class PathFinder {
                         Cell neighbor = grid.getNeighbor(currentCell, movement);
 
                         if (neighbor != null && !visited.contains(neighbor) && !neighbor.isObstacle()) {
-                            int cost = currentNode.cost() + getMovementCostUCS(currentCell, neighbor, movement);
+                            int cost = currentNode.cost() + getMovementCost(currentCell, neighbor, movement);
                             Node neighborNode = new Node(neighbor, currentNode, movement,cost);
                             stack.add(neighborNode);
                             stop++;
@@ -145,7 +145,7 @@ public class PathFinder {
             for (Movement movement : Movement.values()) {
                 Cell neighbor = grid.getNeighbor(currentCell, movement);
                 if (neighbor != null && !visited.contains(neighbor) && !neighbor.isObstacle()) {
-                    int cost = currentNode.cost() + getMovementCostUCS(currentCell, neighbor, movement);
+                    int cost = currentNode.cost() + getMovementCost(currentCell, neighbor, movement);
                     Node neighborNode = new Node(neighbor, currentNode, movement, cost);
                     priorityQueue.add(neighborNode);
                 }
@@ -155,11 +155,45 @@ public class PathFinder {
         return new Result(nodesExpanded, null,0);
     }
 
-    private int getMovementCostUCS(Cell current, Cell neighbor, Movement movement) {
+    private int getMovementCost(Cell current, Cell neighbor, Movement movement) {
         return switch (movement) {
             case UP, DOWN -> grid.costVertical[current.getX()][Math.min(current.getY(), neighbor.getY())];
             case LEFT, RIGHT -> grid.costHorizontal[Math.min(current.getX(), neighbor.getX())][current.getY()];
         };
+    }
+
+    public Result findPathGreedy(Store store, Destination destination, Heuristic heuristic) {
+        PriorityQueue<Node> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(node ->
+                heuristic.calculate(node.cell(), destination)));
+        Set<Cell> visited = new HashSet<>();
+        int nodesExpanded = 0;
+        Cell startCell = grid.getCell(store.x(), store.y());
+        Node startNode = new Node(startCell, null, null,0);
+        priorityQueue.add(startNode);
+
+        while (!priorityQueue.isEmpty()) {
+            Node currentNode = priorityQueue.poll();
+            nodesExpanded++;
+            Cell currentCell = currentNode.cell();
+
+            if (currentCell.getX() == destination.x() && currentCell.getY() == destination.y()) {
+                return reconstructPath(currentNode, nodesExpanded);
+            }
+
+            if (!visited.add(currentCell)) {
+                continue;
+            }
+
+            for (Movement movement : Movement.values()) {
+                Cell neighbor = grid.getNeighbor(currentCell, movement);
+                if (neighbor != null && !visited.contains(neighbor) && !neighbor.isObstacle()) {
+                    int cost = currentNode.cost() + getMovementCost(currentCell, neighbor, movement);
+                    Node neighborNode = new Node(neighbor, currentNode, movement, cost);
+                    priorityQueue.add(neighborNode);
+                }
+            }
+        }
+        return new Result(nodesExpanded, null, 0);
     }
 
     private Result reconstructPath(Node node, int nodesExpanded) {
