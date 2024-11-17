@@ -1,4 +1,3 @@
-@FunctionalInterface
 public interface Heuristic {
     int calculate(Cell cell, Destination destination);
 
