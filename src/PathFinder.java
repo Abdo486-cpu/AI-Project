@@ -196,6 +196,43 @@ public class PathFinder {
         return new Result(nodesExpanded, null, 0);
     }
 
+    public Result findPathAStar(Store store, Destination destination, Heuristic heuristic) {
+        PriorityQueue<Node> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(node ->
+                node.cost() + heuristic.calculate(node.cell(), destination)));
+        Set<Cell> visited = new HashSet<>();
+        int nodesExpanded = 0;
+
+        Cell startCell = grid.getCell(store.x(), store.y());
+        Node startNode = new Node(startCell, null, null, 0);
+        priorityQueue.add(startNode);
+
+        while (!priorityQueue.isEmpty()) {
+            Node currentNode = priorityQueue.poll();
+            nodesExpanded++;
+            Cell currentCell = currentNode.cell();
+
+            if (currentCell.getX() == destination.x() && currentCell.getY() == destination.y()) {
+                return reconstructPath(currentNode, nodesExpanded);
+            }
+
+            if (!visited.add(currentCell)) {
+                continue;
+            }
+
+            for (Movement movement : Movement.values()) {
+                Cell neighbor = grid.getNeighbor(currentCell, movement);
+                if (neighbor != null && !visited.contains(neighbor) && !neighbor.isObstacle()) {
+                    int cost = currentNode.cost() + getMovementCost(currentCell, neighbor, movement);
+                    Node neighborNode = new Node(neighbor, currentNode, movement, cost);
+                    priorityQueue.add(neighborNode);
+                }
+            }
+        }
+
+        return new Result(nodesExpanded, null, 0);
+    }
+
+
     private Result reconstructPath(Node node, int nodesExpanded) {
         List<Movement> path = new ArrayList<>();
         int totalCost = node.cost();
