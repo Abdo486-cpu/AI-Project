@@ -24,6 +24,10 @@ public class Cell {
         this.originalType = type;
     }
 
+    public CellType getType(Cell cell) {
+        return cell.type;
+    }
+
     public void setTruck() {
         if (type != CellType.TRUCK) {
             originalType = type;

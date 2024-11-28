@@ -3,12 +3,12 @@ import java.util.*;
 public class Grid {
     private final int width, height;
     private final Cell[][] grid;
-    private final List<Store> stores;
-    private final List<Destination> destinations;
+    final List<Store> stores;
+    final List<Destination> destinations;
     private final List<Obstacle> obstacles;
-    private final List<Tunnel> tunnels;
-    final int[][] costHorizontal;
-    final int[][] costVertical;
+    final List<Tunnel> tunnels;
+    int[][] costHorizontal;
+    int[][] costVertical;
 
     public Grid(int width, int height) {
         this.width = width;
@@ -29,16 +29,11 @@ public class Grid {
                 grid[i][j] = new Cell(i, j);
             }
         }
-        for (int i = 0; i < width - 1; i++) {
-            for (int j = 0; j < height; j++) {
-                costHorizontal[i][j] = (int) (Math.random() * 4) + 1;
-            }
-        }
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height - 1; j++) {
-                costVertical[i][j] = (int) (Math.random() * 4) + 1;
-            }
-        }
+    }
+
+    public void addCosts(int[][] horizontal, int[][] vertical) {
+        costVertical = vertical;
+        costHorizontal = horizontal;
     }
 
     public void addStore(Store store) {
