@@ -6,8 +6,7 @@ import java.util.Set;
 
 public class Main {
     public static void main(String[] args) {
-        Plan("5;3;2;1;3,2,3,0;1,2;2,0,1,1;", "0,1,0,0,3;0,2,0,1,0;1,0,0,0,3;1,1,0,1,1;1,1,1,0,3;1,2,0,2,0;1,2,1,1,1;2,0,1,0,1;2,1,1,1,0;2,1,2,0,1;2,2,1,2,0;2,2,2,1,0;3,0,2,0,3;3,1,2,1,2;3,1,3,0,3;3,2,2,2,0;3,2,3,1,2;4,0,3,0,0;4,1,3,1,0;4,1,4,0,2;4,2,3,2,1;4,2,4,1,2;",
-                "BF", true);
+        Plan("5;3;2;1;3,2,3,0;1,2;2,0,1,1;", "0,1,0,0,3;0,2,0,1,0;1,0,0,0,3;1,1,0,1,1;1,1,1,0,3;1,2,0,2,0;1,2,1,1,1;2,0,1,0,1;2,1,1,1,0;2,1,2,0,1;2,2,1,2,0;2,2,2,1,0;3,0,2,0,3;3,1,2,1,2;3,1,3,0,3;3,2,2,2,0;3,2,3,1,2;4,0,3,0,0;4,1,3,1,0;4,1,4,0,2;4,2,3,2,1;4,2,4,1,2;","AS2", true);
     }
 
     public static void Plan(String states,String traffic,String strategy, boolean visualize){
@@ -26,21 +25,21 @@ public class Main {
 
         Result[] chosenPaths = new Result[grid.destinations.size()];
         int[] chosenStores = new int[grid.destinations.size()];
-        int best = Integer.MAX_VALUE;
         for(int i = 0; i < grid.destinations.size(); i++){
+            int best = Integer.MAX_VALUE;
             Result chosen = null;
             for(int j = 0; j < grid.stores.size(); j++) {
                 Result res = Path(grid,grid.stores.get(j),grid.destinations.get(i),method);
                 if(res.cost() < best){
                     best = res.cost();
+                    chosenStores[i] = j;
+                    chosen = res;
                 }
-                chosen = res;
-                chosenStores[i] = j;
             }
             chosenPaths[i] = chosen;
         }
         for (int i = 0; i < chosenPaths.length; i++) {
-            System.out.println("Chosen path for destination "+i+": Store "+ chosenStores[i]
+            System.out.println("Chosen path for destination "+(chosenPaths.length-i)+": Store "+ (chosenStores[i]+1)
                     +" Cost: "+chosenPaths[i].cost()+" Expanded nodes: "+chosenPaths[i].nodesExpanded());
             System.out.println("Path from store to destination:");
             List<Movement> path = chosenPaths[i].path();

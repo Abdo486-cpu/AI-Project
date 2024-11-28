@@ -2,9 +2,11 @@ import java.util.*;
 
 public class PathFinder {
     private final Grid grid;
+    private boolean[] tunnelCostCheck;
 
     public PathFinder(Grid grid) {
         this.grid = grid;
+        this.tunnelCostCheck = new boolean[grid.tunnels.size()];
     }
 
     public Result findPathDFS(Store store, Destination destination){
@@ -155,36 +157,46 @@ public class PathFinder {
         return new Result(nodesExpanded, null,0);
     }
 
+
     private int getMovementCost(Cell current, Cell neighbor, Movement movement) {
         switch (movement) {
-            case UP, DOWN :
-                if(current.getType(current) == CellType.TUNNEL_ENTRY || current.getType(current) == CellType.TUNNEL_EXIT){
-                int tunnelCost = 0;
-                for (Tunnel tunnel : grid.tunnels) {
-                    if ((current.getX() == tunnel.x1()  && current.getY() == tunnel.y1()) ||
-                            (current.getX() == tunnel.x2() && current.getY() == tunnel.y2() )) {
-                        tunnelCost = tunnel.tunnelCost();
-                        break;
-                    }
-                }
-                return grid.costVertical[current.getX()][Math.min(current.getY(), neighbor.getY())] + tunnelCost;
-            }else{
-                return grid.costVertical[current.getX()][Math.min(current.getY(), neighbor.getY())];
-            }
-            case LEFT, RIGHT :
+            case UP, DOWN ->{
                 if(current.getType(current) == CellType.TUNNEL_ENTRY || current.getType(current) == CellType.TUNNEL_EXIT){
                     int tunnelCost = 0;
-                    for (Tunnel tunnel : grid.tunnels) {
-                        if ((current.getX() == tunnel.x1()  && current.getY() == tunnel.y1()) ||
-                                (current.getX() == tunnel.x2() && current.getY() == tunnel.y2() )) {
-                            tunnelCost = tunnel.tunnelCost();
-                            break;
+                    for (int i = 0; i< grid.tunnels.size(); i++) {
+                        if (!tunnelCostCheck[i]) {
+                            if ((current.getX() == grid.tunnels.get(i).x1()  && current.getY() == grid.tunnels.get(i).y1()) ||
+                                    (current.getX() == grid.tunnels.get(i).x2() && current.getY() == grid.tunnels.get(i).y2())) {
+                                tunnelCost = grid.tunnels.get(i).tunnelCost();
+                                tunnelCostCheck[i] = true;
+                                break;
+                            }
                         }
                     }
-                    return grid.costHorizontal[current.getX()][Math.min(current.getY(), neighbor.getY())] + tunnelCost;
+                    return grid.costVertical[current.getX()][Math.min(current.getY(), neighbor.getY())] + tunnelCost;
                 }else{
-                    return grid.costHorizontal[current.getX()][Math.min(current.getY(), neighbor.getY())];
+                    return grid.costVertical[current.getX()][Math.min(current.getY(), neighbor.getY())];
                 }
+            }
+            case LEFT, RIGHT ->{
+                if(current.getType(current) == CellType.TUNNEL_ENTRY || current.getType(current) == CellType.TUNNEL_EXIT){
+                    int tunnelCost = 0;
+                    for (int i = 0; i< grid.tunnels.size(); i++) {
+                        if (!tunnelCostCheck[i]) {
+                            if ((current.getX() == grid.tunnels.get(i).x1()  && current.getY() == grid.tunnels.get(i).y1()) ||
+                                    (current.getX() == grid.tunnels.get(i).x2() && current.getY() == grid.tunnels.get(i).y2())) {
+                                tunnelCost = grid.tunnels.get(i).tunnelCost();
+                                tunnelCostCheck[i] = true;
+                                break;
+                            }
+                        }
+                    }
+                    return grid.costHorizontal[Math.min(current.getX(), neighbor.getX())][current.getY()] + tunnelCost;
+                }else{
+                    return grid.costHorizontal[Math.min(current.getX(), neighbor.getX())][current.getY()];
+                }
+            }
+
         }
         return 0;
     }
