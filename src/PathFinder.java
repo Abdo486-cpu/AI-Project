@@ -156,11 +156,39 @@ public class PathFinder {
     }
 
     private int getMovementCost(Cell current, Cell neighbor, Movement movement) {
-        return switch (movement) {
-            case UP, DOWN -> grid.costVertical[current.getX()][Math.min(current.getY(), neighbor.getY())];
-            case LEFT, RIGHT -> grid.costHorizontal[Math.min(current.getX(), neighbor.getX())][current.getY()];
-        };
+        switch (movement) {
+            case UP, DOWN :
+                if(current.getType(current) == CellType.TUNNEL_ENTRY || current.getType(current) == CellType.TUNNEL_EXIT){
+                int tunnelCost = 0;
+                for (Tunnel tunnel : grid.tunnels) {
+                    if ((current.getX() == tunnel.x1()  && current.getY() == tunnel.y1()) ||
+                            (current.getX() == tunnel.x2() && current.getY() == tunnel.y2() )) {
+                        tunnelCost = tunnel.tunnelCost();
+                        break;
+                    }
+                }
+                return grid.costVertical[current.getX()][Math.min(current.getY(), neighbor.getY())] + tunnelCost;
+            }else{
+                return grid.costVertical[current.getX()][Math.min(current.getY(), neighbor.getY())];
+            }
+            case LEFT, RIGHT :
+                if(current.getType(current) == CellType.TUNNEL_ENTRY || current.getType(current) == CellType.TUNNEL_EXIT){
+                    int tunnelCost = 0;
+                    for (Tunnel tunnel : grid.tunnels) {
+                        if ((current.getX() == tunnel.x1()  && current.getY() == tunnel.y1()) ||
+                                (current.getX() == tunnel.x2() && current.getY() == tunnel.y2() )) {
+                            tunnelCost = tunnel.tunnelCost();
+                            break;
+                        }
+                    }
+                    return grid.costHorizontal[current.getX()][Math.min(current.getY(), neighbor.getY())] + tunnelCost;
+                }else{
+                    return grid.costHorizontal[current.getX()][Math.min(current.getY(), neighbor.getY())];
+                }
+        }
+        return 0;
     }
+
 
     public Result findPathGreedy(Store store, Destination destination, Heuristic heuristic) {
         PriorityQueue<Node> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(node ->
