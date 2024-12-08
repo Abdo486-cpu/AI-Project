@@ -2,11 +2,9 @@ import java.util.*;
 
 public class PathFinder {
     private final Grid grid;
-    private boolean[] tunnelCostCheck;
 
     public PathFinder(Grid grid) {
         this.grid = grid;
-        this.tunnelCostCheck = new boolean[grid.tunnels.size()];
     }
 
     public Result findPathDFS(Store store, Destination destination){
@@ -161,42 +159,27 @@ public class PathFinder {
     private int getMovementCost(Cell current, Cell neighbor, Movement movement) {
         switch (movement) {
             case UP, DOWN ->{
-                if(current.getType(current) == CellType.TUNNEL_ENTRY || current.getType(current) == CellType.TUNNEL_EXIT){
-                    int tunnelCost = 0;
-                    for (int i = 0; i< grid.tunnels.size(); i++) {
-                        if (!tunnelCostCheck[i]) {
-                            if ((current.getX() == grid.tunnels.get(i).x1()  && current.getY() == grid.tunnels.get(i).y1()) ||
-                                    (current.getX() == grid.tunnels.get(i).x2() && current.getY() == grid.tunnels.get(i).y2())) {
-                                tunnelCost = grid.tunnels.get(i).tunnelCost();
-                                tunnelCostCheck[i] = true;
-                                break;
-                            }
-                        }
+                for (Tunnel tunnel : grid.tunnels) {
+                    if(neighbor.getX() == tunnel.x1() && neighbor.getY() == tunnel.y1()) {
+                        return grid.costVertical[current.getX()][Math.min(tunnel.y2(), current.getY())] + tunnel.tunnelCost();
                     }
-                    return grid.costVertical[current.getX()][Math.min(current.getY(), neighbor.getY())] + tunnelCost;
-                }else{
-                    return grid.costVertical[current.getX()][Math.min(current.getY(), neighbor.getY())];
+                    if(neighbor.getX() == tunnel.x2() && neighbor.getY() == tunnel.y2()) {
+                        return grid.costVertical[current.getX()][Math.min(tunnel.y1(), current.getY())] + tunnel.tunnelCost();
+                    }
                 }
+                return grid.costVertical[current.getX()][Math.min(current.getY(), neighbor.getY())];
             }
             case LEFT, RIGHT ->{
-                if(current.getType(current) == CellType.TUNNEL_ENTRY || current.getType(current) == CellType.TUNNEL_EXIT){
-                    int tunnelCost = 0;
-                    for (int i = 0; i< grid.tunnels.size(); i++) {
-                        if (!tunnelCostCheck[i]) {
-                            if ((current.getX() == grid.tunnels.get(i).x1()  && current.getY() == grid.tunnels.get(i).y1()) ||
-                                    (current.getX() == grid.tunnels.get(i).x2() && current.getY() == grid.tunnels.get(i).y2())) {
-                                tunnelCost = grid.tunnels.get(i).tunnelCost();
-                                tunnelCostCheck[i] = true;
-                                break;
-                            }
-                        }
+                for (Tunnel tunnel : grid.tunnels) {
+                    if(neighbor.getX() == tunnel.x1() && neighbor.getY() == tunnel.y1()) {
+                        return grid.costHorizontal[Math.min(tunnel.x2(), current.getX())][tunnel.y2()] + tunnel.tunnelCost();
                     }
-                    return grid.costHorizontal[Math.min(current.getX(), neighbor.getX())][current.getY()] + tunnelCost;
-                }else{
-                    return grid.costHorizontal[Math.min(current.getX(), neighbor.getX())][current.getY()];
+                    if(neighbor.getX() == tunnel.x2() && neighbor.getY() == tunnel.y2()) {
+                        return grid.costHorizontal[Math.min(tunnel.x1(), current.getX())][tunnel.y1()] + tunnel.tunnelCost();
+                    }
                 }
+                return grid.costHorizontal[Math.min(current.getX(), neighbor.getX())][current.getY()];
             }
-
         }
         return 0;
     }
@@ -276,7 +259,7 @@ public class PathFinder {
     private Result reconstructPath(Node node, int nodesExpanded) {
         List<Movement> path = new ArrayList<>();
         int totalCost = node.cost();
-        while (node != null && node.movement() != null) {
+        while (node.movement() != null) {
             path.add(node.movement());
             node = node.parent();
         }
